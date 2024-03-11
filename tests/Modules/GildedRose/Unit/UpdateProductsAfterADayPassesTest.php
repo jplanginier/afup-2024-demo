@@ -3,18 +3,36 @@ declare(strict_types=1);
 
 namespace App\Tests\Modules\GildedRose\Unit;
 
+use App\Module\GildedRose\Product;
+use App\Module\GildedRose\ProductRepositoryInterface;
+use App\Module\GildedRose\UseCase\UpdateProductsAfterADayPasses;
+use App\Tests\Modules\GildedRose\fixture\StaticProductRepository;
 use PHPUnit\Framework\TestCase;
 
 class UpdateProductsAfterADayPassesTest extends TestCase
 {
-    public function testItWorks(): void {
-        $this->assertTrue(true);
+    public function testProductsAreLoadedFromRepository(): void {
+        $repository = new StaticProductRepository();
+        $sut = new UpdateProductsAfterADayPasses($repository);
+
+        $sut->__invoke();
+
+        $this->assertTrue($repository->wasCalled());
+    }
+
+    public function testProductChangedAfterADay(): void {
+        $repository = new StaticProductRepository(new Product(name: 'my product', value: 15, durability: 7));
+
+        $sut = new UpdateProductsAfterADayPasses($repository);
+
+        $sut->__invoke();
+
+        $modifiedProduct = $repository->getByName('my product');
+        $this->assertEquals(16, $modifiedProduct->value());
+        $this->assertEquals(6, $modifiedProduct->durability());
     }
 
     // product has a name, a value, and a durability in days
-    // products are taken from a repository
-    // products are iterated over (not all products are loaded)
-    // standard product = 1 day passes : -1 durability, + 1 value
     // if durability < 0 : 1 day passes : -1 durability, -1 value
     // if is a cheese from a list, +3 value if durability is positive, -10 if negative
     // if named "doom hammer", legendary : value is set to 1000, durability won't move
