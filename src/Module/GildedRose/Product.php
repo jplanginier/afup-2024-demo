@@ -26,9 +26,36 @@ readonly class Product
     }
 
     public function aDayPasses(): Product {
+
+        if ($this->isDoomHammer()) {
+            return new Product($this->name, 1000, $this->durability);
+        }
+
         $durability = $this->durability - 1;
-        $value = $this->value + 1;
+        if ($durability < 0) {
+            if ($this->isCheese()) {
+                $value = $this->value - 10;
+            } else {
+                $value = $this->value - 1;
+            }
+        } else {
+            if ($this->isCheese()) {
+                $value = $this->value + 3;
+            } else {
+                $value = $this->value + 1;
+            }
+        }
 
         return new Product($this->name, $value, $durability);
     }
+
+    private function isCheese(): bool {
+        return in_array($this->name, ['cheddar']);
+    }
+
+    private function isDoomHammer() {
+        return $this->name === 'Doomhammer';
+    }
+
+
 }

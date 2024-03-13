@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\Tests\Modules\GildedRose\Unit;
 
 use App\Module\GildedRose\Product;
-use App\Module\GildedRose\ProductRepositoryInterface;
 use App\Module\GildedRose\UseCase\UpdateProductsAfterADayPasses;
 use App\Tests\Modules\GildedRose\fixture\StaticProductRepository;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +19,7 @@ class UpdateProductsAfterADayPassesTest extends TestCase
         $this->assertTrue($repository->wasCalled());
     }
 
-    public function testProductChangedAfterADay(): void {
+    public function testProductGainsOneValueAndLoseADurabilityWhenADayPasses(): void {
         $repository = new StaticProductRepository(new Product(name: 'my product', value: 15, durability: 7));
 
         $sut = new UpdateProductsAfterADayPasses($repository);
@@ -32,10 +31,56 @@ class UpdateProductsAfterADayPassesTest extends TestCase
         $this->assertEquals(6, $modifiedProduct->durability());
     }
 
-    // product has a name, a value, and a durability in days
-    // if durability < 0 : 1 day passes : -1 durability, -1 value
-    // if is a cheese from a list, +3 value if durability is positive, -10 if negative
-    // if named "doom hammer", legendary : value is set to 1000, durability won't move
+    public function testProductLoseValueWhenDurabilityIsNegative(): void {
+        $repository = new StaticProductRepository(new Product(name: 'my product', value: 15, durability: -1));
+
+        $sut = new UpdateProductsAfterADayPasses($repository);
+
+        $sut->__invoke();
+
+        $modifiedProduct = $repository->getByName('my product');
+        $this->assertEquals(14, $modifiedProduct->value());
+        $this->assertEquals(-2, $modifiedProduct->durability());
+    }
+
+    public function testProductIsACheeseAndGetsMoreValuePerDayWhenDurabilityIsPositive(): void {
+        $repository = new StaticProductRepository(new Product(name: 'cheddar', value: 15, durability: 15));
+
+        $sut = new UpdateProductsAfterADayPasses($repository);
+
+        $sut->__invoke();
+
+        $modifiedProduct = $repository->getByName('cheddar');
+        $this->assertEquals(18, $modifiedProduct->value());
+        $this->assertEquals(14, $modifiedProduct->durability());
+    }
+
+    public function testProductIsACheeseAndLoseALotOfValuePerDayWhenDurabilityIsNegative(): void {
+        $repository = new StaticProductRepository(new Product(name: 'cheddar', value: 15, durability: -1));
+
+        $sut = new UpdateProductsAfterADayPasses($repository);
+
+        $sut->__invoke();
+
+        $modifiedProduct = $repository->getByName('cheddar');
+        $this->assertEquals(5, $modifiedProduct->value());
+        $this->assertEquals(-2, $modifiedProduct->durability());
+    }
+
+    public function testDoomHammerIsLegendaryAndWillHaveAFixedValueAndWontLoseDurability(): void {
+        $repository = new StaticProductRepository(new Product(name: 'Doomhammer', value: 1, durability: 20));
+
+        $sut = new UpdateProductsAfterADayPasses($repository);
+
+        $sut->__invoke();
+
+        $modifiedProduct = $repository->getByName('Doomhammer');
+        $this->assertEquals(1000, $modifiedProduct->value());
+        $this->assertEquals(20, $modifiedProduct->durability());
+    }
+
+    // edge case : durability is at 0 before the day passes
+    // edge case : durability is at 0 after the day passes
     // if named "Ticket : xxx" : value + 5 when durability positive, goes to 0 when durability is null (or negative)
     // if named "Curse of xxx", stop all process and throw Exception : the product would corrupt our shop !
     // product with null or negative value : message to auctioneer to remove the item later that day
