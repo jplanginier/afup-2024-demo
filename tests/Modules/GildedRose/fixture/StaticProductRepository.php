@@ -3,24 +3,23 @@ declare(strict_types=1);
 
 namespace App\Tests\Modules\GildedRose\fixture;
 
-use App\Module\GildedRose\Product;
+use App\Module\GildedRose\Product\UnidentifiedProduct;
 use App\Module\GildedRose\ProductRepositoryInterface;
-use Iterator;
 
 class StaticProductRepository implements ProductRepositoryInterface
 {
-    /** @var Product[] */
+    /** @var UnidentifiedProduct[] */
     private array $products = [];
 
     private bool $wasCalled = false;
 
-    public function __construct(Product ...$products) {
+    public function __construct(UnidentifiedProduct ...$products) {
         foreach ($products as $product) {
             $this->updateProduct($product);
         }
     }
 
-    public function updateProduct(Product $product): void
+    public function updateProduct(UnidentifiedProduct $product): void
     {
         // prevents errors in test where the object is modified by reference, without being really saved
         $this->products[$product->name()] = clone $product;
@@ -28,7 +27,7 @@ class StaticProductRepository implements ProductRepositoryInterface
 
 
     /**
-     * @return iterable<?Product>
+     * @return iterable<?UnidentifiedProduct>
      */
     public function productsIterable(): iterable
     {
@@ -42,7 +41,7 @@ class StaticProductRepository implements ProductRepositoryInterface
         return $this->wasCalled;
     }
 
-    public function getByName(string $name): ?Product {
+    public function getByName(string $name): ?UnidentifiedProduct {
         return $this->products[$name] ?? null;
     }
 }

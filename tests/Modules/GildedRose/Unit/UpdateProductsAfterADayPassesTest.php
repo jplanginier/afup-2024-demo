@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Modules\GildedRose\Unit;
 
-use App\Module\GildedRose\Product;
+use App\Module\GildedRose\Product\UnidentifiedProduct;
 use App\Module\GildedRose\UseCase\UpdateProductsAfterADayPasses;
 use App\Tests\Modules\GildedRose\fixture\StaticProductRepository;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +20,7 @@ class UpdateProductsAfterADayPassesTest extends TestCase
     }
 
     public function testProductGainsOneValueAndLoseADurabilityWhenADayPasses(): void {
-        $repository = new StaticProductRepository(new Product(name: 'my product', value: 15, durability: 7));
+        $repository = new StaticProductRepository(new UnidentifiedProduct(name: 'my product', value: 15, durability: 7));
 
         $sut = new UpdateProductsAfterADayPasses($repository);
 
@@ -32,7 +32,7 @@ class UpdateProductsAfterADayPassesTest extends TestCase
     }
 
     public function testProductLoseValueWhenDurabilityIsNegative(): void {
-        $repository = new StaticProductRepository(new Product(name: 'my product', value: 15, durability: -1));
+        $repository = new StaticProductRepository(new UnidentifiedProduct(name: 'my product', value: 15, durability: -1));
 
         $sut = new UpdateProductsAfterADayPasses($repository);
 
@@ -44,7 +44,7 @@ class UpdateProductsAfterADayPassesTest extends TestCase
     }
 
     public function testProductIsACheeseAndGetsMoreValuePerDayWhenDurabilityIsPositive(): void {
-        $repository = new StaticProductRepository(new Product(name: 'cheddar', value: 15, durability: 15));
+        $repository = new StaticProductRepository(new UnidentifiedProduct(name: 'cheddar', value: 15, durability: 15));
 
         $sut = new UpdateProductsAfterADayPasses($repository);
 
@@ -56,7 +56,7 @@ class UpdateProductsAfterADayPassesTest extends TestCase
     }
 
     public function testProductIsACheeseAndLoseALotOfValuePerDayWhenDurabilityIsNegative(): void {
-        $repository = new StaticProductRepository(new Product(name: 'cheddar', value: 15, durability: -1));
+        $repository = new StaticProductRepository(new UnidentifiedProduct(name: 'cheddar', value: 15, durability: -1));
 
         $sut = new UpdateProductsAfterADayPasses($repository);
 
@@ -68,7 +68,7 @@ class UpdateProductsAfterADayPassesTest extends TestCase
     }
 
     public function testDoomHammerIsLegendaryAndWillHaveAFixedValueAndWontLoseDurability(): void {
-        $repository = new StaticProductRepository(new Product(name: 'Doomhammer', value: 1, durability: 20));
+        $repository = new StaticProductRepository(new UnidentifiedProduct(name: 'Doomhammer', value: 1, durability: 20));
 
         $sut = new UpdateProductsAfterADayPasses($repository);
 

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Module\GildedRose;
+namespace App\Module\GildedRose\Product;
 
-readonly class Product
+readonly class UnidentifiedProduct
 {
     public function __construct(
         private string $name,
@@ -25,10 +25,10 @@ readonly class Product
         return $this->durability;
     }
 
-    public function aDayPasses(): Product {
+    public function aDayPasses(): UnidentifiedProduct {
 
         if ($this->isDoomHammer()) {
-            return new Product($this->name, 1000, $this->durability);
+            return new UnidentifiedProduct($this->name, 1000, $this->durability);
         }
 
         $durability = $this->durability - 1;
@@ -46,15 +46,7 @@ readonly class Product
             }
         }
 
-        return new Product($this->name, $value, $durability);
-    }
-
-    private function isCheese(): bool {
-        return in_array($this->name, ['cheddar']);
-    }
-
-    private function isDoomHammer() {
-        return $this->name === 'Doomhammer';
+        return new UnidentifiedProduct($this->name, $value, $durability);
     }
 
 
