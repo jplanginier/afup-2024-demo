@@ -25,6 +25,10 @@ abstract class ProductBase implements IdentifiedProductInterface
         return $this->unidentifiedVersion;
     }
 
+    public function value(): int {
+        return $this->unidentifiedVersion->value();
+    }
+
     abstract protected function valueAfterADayPasses(): int;
 
     abstract protected function durabilityAfterADayPasses(): int;

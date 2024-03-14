@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Modules\GildedRose\fixture;
 
+use App\Module\GildedRose\Dependencies\ProductRepositoryInterface;
 use App\Module\GildedRose\Product\UnidentifiedProduct;
-use App\Module\GildedRose\ProductRepositoryInterface;
 
 class StaticProductRepository implements ProductRepositoryInterface
 {
